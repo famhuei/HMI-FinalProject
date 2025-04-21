@@ -1,0 +1,27 @@
+# Thêm các mục sau nếu chưa có
+# Android Studio
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Gradle
+.gradle/
+gradle-app.setting
+
+# Keystore (file bảo mật)
+*.jks
+*.keystore
+
+# Logs và file tạm
+*.log
+*.tmp
+
+# File kết quả build
+/app/release/
+/app/debug/
