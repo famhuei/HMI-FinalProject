@@ -66,7 +66,8 @@ fun ApplicationNavHost(
         composable(route = MoodTrackingDestination.route) {
             MoodTrackingScreen(cameraExecutor = cameraExecutor,
                 navigateToFaceRecognition = {navController.navigate(FaceRecognition.route)},
-                navigateToExploreMode = {navController.navigate(DetectionDestination.route)}
+                navigateToExploreMode = {navController.navigate(DetectionDestination.route)},
+                textToSpeech = textToSpeech
             )
         }
         composable(route = FaceRecognition.route) {
@@ -77,5 +78,6 @@ fun ApplicationNavHost(
             )
 
         }
+
     }
 }
