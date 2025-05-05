@@ -7,5 +7,6 @@ data class DetectionObject (
     val label: String,
     val boundingBox: RectF,
     val horizontalPosition: String,
-    val verticalPosition: String
+    val verticalPosition: String,
+    val distanceMeters: Float? = null
 )
