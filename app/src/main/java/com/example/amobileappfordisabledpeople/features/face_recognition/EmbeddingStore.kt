@@ -29,9 +29,9 @@ object EmbeddingStore {
             R.drawable.donal_trump,
             R.drawable.mtp,
             R.drawable.rihanna,
-            R.drawable.thu_vu,
+            R.drawable.nhat,
 //            R.drawable.hung,
-            R.drawable.ha
+
         )
 
         val embeddings = mutableListOf<FloatArray>()

@@ -145,7 +145,16 @@ fun FaceRecognitionScreen(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-                                textToSpeech?.speak(recognizedPerson.value, TextToSpeech.QUEUE_FLUSH, null, null)
+//                                textToSpeech?.speak(recognizedPerson.value, TextToSpeech.QUEUE_FLUSH, null, null)
+                                val personName = recognizedPerson.value // or dynamically update this value
+                                val speechText = if (personName.isNotEmpty()) {
+                                    "Recognized person: $personName. Tap again to hear more."
+                                } else {
+                                    "Person not recognized. Tap again to try another scan."
+                                }
+
+                                // Speak the feedback for visually impaired users
+                                textToSpeech?.speak(speechText, TextToSpeech.QUEUE_FLUSH, null, null)
                             }
                         )
                     }
@@ -167,7 +176,7 @@ fun DrawFaces(faces: List<Face>, imageWidth: Int, imageHeight: Int, screenWidth:
             )
             drawBounds(topLeft, size, Color.Yellow, 5f)
 
-            val recognition = "$name\n$distance"
+            val recognition = "$name: ${"%.2f".format(distance)}"
             drawContext.canvas.nativeCanvas.drawText(
                 recognition,
                 topLeft.x,

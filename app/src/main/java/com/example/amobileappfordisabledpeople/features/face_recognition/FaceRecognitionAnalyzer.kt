@@ -60,16 +60,7 @@ class FaceRecognitionAnalyzer(
                                 val preprocessedImage = preprocessImage(tensorImage)
                                 val faceEmbedding = faceNetModel.getEmbedding(preprocessedImage)
 
-                                val famous = listOf(
-                                    "Billie Eilish",
-                                    "David Beckham",
-                                    "Donald Trump",
-                                    "MTP",
-                                    "Rihanna",
-                                    "Thu Vu",
-//                                    "Xuan Hung",
-                                    "Ha Tang"
-                                )
+                                val famous = listOf("Billie Eilish", "David Beckham", "Donald Trump", "MTP", "My Tam", "Nhat", "Rihanna")
 
                                 EmbeddingStore.getEmbeddings().forEachIndexed { index, embedding ->
                                     val distance = calculateEuclideanDistance(faceEmbedding, embedding)
