@@ -46,6 +46,7 @@ import kotlinx.coroutines.delay
 import org.tensorflow.lite.Interpreter
 import java.util.concurrent.ExecutorService
 import kotlin.math.abs
+import kotlin.text.*
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -86,9 +87,10 @@ fun DetectionScreen(
                     if (abs(dragAmount.x) > abs(dragAmount.y)) {
                         if (abs(dragAmount.x) > DragThreshold) {
                             if (dragAmount.x > 0) {
-                                navigateToExplore()
-                            } else {
                                 navigateToDangerWarning()
+
+                            } else {
+                                navigateToExplore()
                             }
                         }
                     } else {
@@ -209,14 +211,31 @@ fun CameraPreview(
                             Log.d("ObjectDetection", "Detected Objects: ${previousDetectedObjects}")
 
                             // Đọc nhãn của đối tượng đầu tiên (hoặc tất cả các đối tượng nếu muốn)
+
                             detectedObjectList.firstOrNull()?.let { detectedObject ->
+                                Log.d("ObjectDetection", detectedObject.score.toString())
+
+                                val label = detectedObject.label
+                                val distance = detectedObject.distanceMeters
+                                val horizontal = detectedObject.horizontalPosition
+                                val vertical = detectedObject.verticalPosition
+                                val speechText = if (distance != null) {
+                                    val distanceRounded = String.format("%.1f", distance)
+                                    "There is a $label $distanceRounded meter${if (distanceRounded != "1.0") "s" else ""} away, at the $horizontal $vertical."
+                                } else {
+                                    "Detected a $label at the $horizontal $vertical."
+                                }
+
+                                Log.d("Speech Text", speechText)
+
                                 textToSpeech.speak(
-                                    detectedObject.label,
+                                    speechText,
                                     TextToSpeech.QUEUE_FLUSH,
                                     null,
                                     null
                                 )
                             }
+
                         }
                         viewModel.setList(detectedObjectList)
                     }
@@ -240,7 +259,7 @@ fun CameraPreview(
                 onDraw = {
 
                     detectionListObject.mapIndexed { i, detectionObject ->
-                        Log.d("Object", detectionObject.label + " --- " + detectionObject.score + " --- " + detectionObject.horizontalPosition + " --- " + detectionObject.verticalPosition)
+                        Log.d("Object", detectionObject.label + " --- " + detectionObject.score + " --- " + detectionObject.horizontalPosition + " --- " + detectionObject.verticalPosition + "----" + detectionObject.distanceMeters)
 
                         Log.e("PositionCalculation", "Horizontal: $detectionObject.horizontalPosition, Vertical: $detectionObject.verticalPosition")
 
@@ -267,7 +286,7 @@ fun CameraPreview(
                         drawIntoCanvas {
                             it.nativeCanvas.drawText(
                                 "${detectionObject.label} ${"%,.2f".format(detectionObject.score * 100)}% " +
-                                        "(${detectionObject.horizontalPosition}, ${detectionObject.verticalPosition})",
+                                       "${"%,.2f".format(detectionObject.distanceMeters)} m",
                                 detectionObject.boundingBox.left,            // x-coordinate (top left)
                                 detectionObject.boundingBox.top - 5f,        // y-coordinate (top left)
                                 paint

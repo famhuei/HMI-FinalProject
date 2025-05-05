@@ -45,7 +45,7 @@ fun AppBar(
         selectedTabIndex = 1
     }
 
-    val tabs = listOf("OBJECT DETECTION", "EXPLORE", "OUT")
+    val tabs = listOf("OBJECT DETECTION", "EXPLORE")
 
     TabRow(
         selectedTabIndex = selectedTabIndex,
@@ -88,7 +88,7 @@ fun SocializingModeBar(
         selectedTabIndex = 1
     }
 
-    val tabs = listOf("MOOD TRACKING", "FACE RECOGNITION")
+    val tabs = listOf("MOOD TRACKING", "Face Recognition")
 
     TabRow(
         selectedTabIndex = selectedTabIndex,
@@ -122,5 +122,11 @@ fun SocializingModeBar(
 
 @Composable
 fun App(navHostController: NavHostController = rememberNavController(), cameraExecutor: ExecutorService, yuvToRgbConverter: YuvToRgbConverter, interpreter: Interpreter, labels: List<String>, textToSpeech: TextToSpeech) {
-    ApplicationNavHost(navController = navHostController, cameraExecutor = cameraExecutor, yuvToRgbConverter = yuvToRgbConverter, interpreter = interpreter, labels = labels, textToSpeech = textToSpeech)
+    ApplicationNavHost(
+        navController = navHostController,
+        cameraExecutor = cameraExecutor,
+        yuvToRgbConverter = yuvToRgbConverter,
+        interpreter = interpreter,
+        labels = labels, textToSpeech =
+            textToSpeech)
 }

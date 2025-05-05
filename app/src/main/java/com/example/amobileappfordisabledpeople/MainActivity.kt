@@ -105,8 +105,8 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
         private const val MODEL_EFFICIENTDETV0 = "efficientdet-lite0.tflite"
         private const val MODEL_EFFICIENTDETV1 = "efficientdet-lite1.tflite"
         private const val MODEL_EFFICIENTDETV2 = "efficientdet-lite2.tflite"
-
-        //private const val MODEL_FILE_NAME = "ssd_mobilenet_v1_1_metadata_1.tflite"
+        private  const val MODEL_YOLOV8 = "yolov8n_float32.tflite"
+//        private const val MODEL_FILE_NAME = "ssd_mobilenet_v1_1_metadata_1.tflite"
 
         // Tên tệp nhãn
         //private const val LABEL_FILE_NAME = "coco_labels.txt"  // Tệp nhãn chung cho cả MobileNet và EfficientDet
