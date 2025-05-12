@@ -57,17 +57,17 @@ fun DetectionScreen(
     interpreter: Interpreter,
     labels: List<String>,
     textToSpeech: TextToSpeech,
-    navigateToDangerWarning: () -> Unit = {},
-    navigateToExplore: () -> Unit = {},
-    navigateToSocializingMode: () -> Unit = {},
+    navigateToFaceRecognition: () -> Unit = {},
+    navigateToIntro: () -> Unit = {},
 ) {
 
     val context = LocalContext.current
     val detectionSound = remember { MediaPlayer.create(context, R.raw.object_detection) }
 
     LaunchedEffect(Unit) {
-        detectionSound.start()
-        delay(detectionSound.duration.toLong())
+//        detectionSound.start()
+//        delay(detectionSound.duration.toLong())
+        textToSpeech.speak("Basic mode: object detection", TextToSpeech.QUEUE_FLUSH, null, null)
     }
 
     DisposableEffect(Unit) {
@@ -87,15 +87,12 @@ fun DetectionScreen(
                     if (abs(dragAmount.x) > abs(dragAmount.y)) {
                         if (abs(dragAmount.x) > DragThreshold) {
                             if (dragAmount.x > 0) {
-                                navigateToDangerWarning()
-
-                            } else {
-                                navigateToExplore()
+                               navigateToIntro()
                             }
                         }
                     } else {
                         if (abs(dragAmount.y) > DragThreshold) {
-                            navigateToSocializingMode()
+                            navigateToFaceRecognition()
                         }
                     }
                 }

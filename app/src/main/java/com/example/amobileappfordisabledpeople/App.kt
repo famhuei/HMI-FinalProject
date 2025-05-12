@@ -41,11 +41,12 @@ fun AppBar(
     var selectedTabIndex = 0
     if (destinationName == stringResource(R.string.detection)) {
         selectedTabIndex = 0
-    } else if (destinationName == stringResource(R.string.explore)) {
-        selectedTabIndex = 1
     }
+//    else if (destinationName == stringResource(R.string.explore)) {
+//        selectedTabIndex = 1
+//    }
 
-    val tabs = listOf("OBJECT DETECTION", "EXPLORE")
+    val tabs = listOf("Basic Mode")
 
     TabRow(
         selectedTabIndex = selectedTabIndex,
@@ -82,13 +83,14 @@ fun SocializingModeBar(
     modifier: Modifier = Modifier,
 ) {
     var selectedTabIndex = 0
-    if (destinationName == stringResource(R.string.mood_tracking)) {
+//    if (destinationName == stringResource(R.string.mood_tracking)) {
+//        selectedTabIndex = 0
+//    } else
+    if (destinationName == stringResource(R.string.face_recognition)) {
         selectedTabIndex = 0
-    } else if (destinationName == stringResource(R.string.face_recognition)) {
-        selectedTabIndex = 1
     }
 
-    val tabs = listOf("MOOD TRACKING", "Face Recognition")
+    val tabs = listOf( "Face Recognition")
 
     TabRow(
         selectedTabIndex = selectedTabIndex,

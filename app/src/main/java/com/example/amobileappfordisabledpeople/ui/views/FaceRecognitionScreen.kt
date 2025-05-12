@@ -45,15 +45,18 @@ import java.util.Locale
 import java.util.concurrent.ExecutorService
 import kotlin.collections.forEach
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FaceRecognitionScreen(
     cameraExecutor: ExecutorService,
     viewModel: MainViewModel = hiltViewModel(),
-    navigateToMoodTracking: () -> Unit = {},
-    navigateToExploreMode: () -> Unit = {}
-
+//    navigateToMoodTracking: () -> Unit = {},
+//    navigateToExploreMode: () -> Unit = {} ,
+    navigateToDetection: () -> Unit = {},
+    navigateToIntro: () -> Unit = {},
+    textToSpeech: TextToSpeech,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -70,16 +73,21 @@ fun FaceRecognitionScreen(
     val recognizedPerson = remember { mutableStateOf("None") }
     val distance = remember { mutableStateOf(0f) }
 
-    var textToSpeech by remember { mutableStateOf<TextToSpeech?>(null) }
+//    var textToSpeech by remember { mutableStateOf<TextToSpeech?>(null) }
     val recognitionSound = remember { MediaPlayer.create(context, R.raw.face_recognition) }
+    val moodTrackSound = remember { MediaPlayer.create(context, R.raw.mood_tracking) }
+    val happySound = remember { MediaPlayer.create(context, R.raw.happy_sound) }
+    val upsetSound = remember { MediaPlayer.create(context, R.raw.sad_sound) }
 
     LaunchedEffect(Unit) {
-        recognitionSound.start()
-        textToSpeech = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                textToSpeech?.language = Locale.US
-            }
-        }
+//        recognitionSound.start()
+//        moodTrackSound.start()
+//        textToSpeech = TextToSpeech(context) { status ->
+//            if (status == TextToSpeech.SUCCESS) {
+//                textToSpeech?.language = Locale.US
+//            }
+//        }
+        textToSpeech.speak("Advanced mode: face and emotion recognition", TextToSpeech.QUEUE_FLUSH, null, null)
     }
 
     val applicationViewModel: ApplicationViewModel = hiltViewModel()
@@ -90,6 +98,14 @@ fun FaceRecognitionScreen(
             recognitionSound.stop()
             recognitionSound.release()
             textToSpeech?.shutdown()
+            //emotion
+            moodTrackSound.stop()
+            happySound.stop()
+            upsetSound.stop()
+
+            moodTrackSound.release()
+            happySound.release()
+            upsetSound.release()
         }
     }
 
@@ -100,6 +116,12 @@ fun FaceRecognitionScreen(
         imageHeight.value = height
         recognizedPerson.value = name
         distance.value = actualDistance
+    }
+
+
+    val mood = remember { mutableStateOf<MoodState>(MoodState.Normal) }
+    LaunchedEffect(faces) {
+        mood.value = MoodState.Normal
     }
 
     val imageAnalysis = ImageAnalysis.Builder()
@@ -118,11 +140,12 @@ fun FaceRecognitionScreen(
                 onDrag = { change, dragAmount ->
                     if (abs(dragAmount.x) > abs(dragAmount.y)) {
                         if (abs(dragAmount.x) > DragThreshold) {
-                            navigateToMoodTracking()
+//                            navigateToMoodTracking()
+                            navigateToIntro()
                         }
                     } else {
                         if (abs(dragAmount.y) > DragThreshold) {
-                            navigateToExploreMode()
+                            navigateToDetection()
                         }
                     }
                 }
@@ -145,16 +168,23 @@ fun FaceRecognitionScreen(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-//                                textToSpeech?.speak(recognizedPerson.value, TextToSpeech.QUEUE_FLUSH, null, null)
+//
                                 val personName = recognizedPerson.value // or dynamically update this value
-                                val speechText = if (personName.isNotEmpty()) {
-                                    "Recognized person: $personName. Tap again to hear more."
-                                } else {
-                                    "Person not recognized. Tap again to try another scan."
+                                val moodMessage = when (mood.value) {
+                                    MoodState.Happy -> "They seem happy and cheerful."
+                                    MoodState.Sad -> "They seem a bit sad."
+                                    MoodState.Upset -> "They look upset or troubled."
+                                    MoodState.Normal -> "They appear calm and relaxed."
+                                    else -> "I couldn't detect their mood."
                                 }
 
+                                val message = if (personName.isNotEmpty() && personName != "None") {
+                                    "I recognized ${personName}. $moodMessage Tap again for more details."
+                                } else {
+                                    "I couldn't recognize the person. Tap again to try again."
+                                }
                                 // Speak the feedback for visually impaired users
-                                textToSpeech?.speak(speechText, TextToSpeech.QUEUE_FLUSH, null, null)
+                                textToSpeech?.speak(message, TextToSpeech.QUEUE_FLUSH, null, null)
                             }
                         )
                     }
@@ -177,8 +207,11 @@ fun DrawFaces(faces: List<Face>, imageWidth: Int, imageHeight: Int, screenWidth:
             drawBounds(topLeft, size, Color.Yellow, 5f)
 
             val recognition = "$name: ${"%.2f".format(distance)}"
+            val certainty = "Certainty: ${calculateCertainty(face.headEulerAngleX, face.headEulerAngleY, face.headEulerAngleZ)}%"
+            val smileLevel = "Smile: ${"%.2f".format((face.smilingProbability ?: 0f) * 100)}%"
+            val upsetLevel = "Upset: ${calculateUpsetLevel(face)}%"
             drawContext.canvas.nativeCanvas.drawText(
-                recognition,
+                "$recognition"  + "$smileLevel" + "$upsetLevel",
                 topLeft.x,
                 topLeft.y - 10, // Position the text above the bounding box
                 android.graphics.Paint().apply {
@@ -189,3 +222,87 @@ fun DrawFaces(faces: List<Face>, imageWidth: Int, imageHeight: Int, screenWidth:
         }
     }
 }
+//fun calculateCertainty(angleX: Float, angleY: Float, angleZ: Float): Int {
+//    // Example calculation: combine the angles to form a certainty score
+//    val maxAngle = 30.0f // Define a maximum angle for normalization
+//    val normalizedX = (maxAngle - Math.abs(angleX)) / maxAngle
+//    val normalizedY = (maxAngle - Math.abs(angleY)) / maxAngle
+//    val normalizedZ = (maxAngle - Math.abs(angleZ)) / maxAngle
+//    return ((normalizedX + normalizedY + normalizedZ) / 3 * 100).toInt()
+//}
+//
+//
+//fun calculateUpsetLevel(face: Face): Int {
+//    // Define configurable weights and thresholds
+//    val weights = UpsetWeights(
+//        smile = 0.5f,
+//        eyeOpen = 0.3f,
+//        headPose = 0.2f
+//    )
+//    val thresholds = UpsetThresholds(
+//        maxHeadAngle = 30f,
+//        maxUpsetScore = 100f
+//    )
+//
+//    // Calculate component scores with null safety and boundary checks
+//    val smileScore = 1 - (face.smilingProbability?.coerceIn(0f, 1f) ?: 0f)
+//
+//    val leftEyeScore = 1 - (face.leftEyeOpenProbability?.coerceIn(0f, 1f) ?: 1f)  // Assume eyes are open if null
+//    val rightEyeScore = 1 - (face.rightEyeOpenProbability?.coerceIn(0f, 1f) ?: 1f)
+//    val eyeScore = (leftEyeScore + rightEyeScore) / 2
+//
+//    val headPoseScore = calculateHeadPoseScore(
+//        face.headEulerAngleX ?: 0f,
+//        face.headEulerAngleY ?: 0f,
+//        face.headEulerAngleZ ?: 0f,
+//        thresholds.maxHeadAngle
+//    )
+//
+//    // Calculate weighted upset score
+//    val rawScore = (smileScore * weights.smile) +
+//            (eyeScore * weights.eyeOpen) +
+//            (headPoseScore * weights.headPose)
+//
+//    // Normalize and return (0-100 scale)
+//    return (rawScore.coerceIn(0f, 1f) * thresholds.maxUpsetScore).toInt()
+//}
+//
+//private fun calculateHeadPoseScore(x: Float, y: Float, z: Float, maxAngle: Float): Float {
+//    if (maxAngle <= 0) return 0f
+//
+//    val normalizedX = (x.absoluteValue / maxAngle).coerceIn(0f, 1f)
+//    val normalizedY = (y.absoluteValue / maxAngle).coerceIn(0f, 1f)
+//    val normalizedZ = (z.absoluteValue / maxAngle).coerceIn(0f, 1f)
+//
+//    return (normalizedX + normalizedY + normalizedZ) / 3f
+//}
+//
+//// Configuration classes
+//data class UpsetWeights(
+//    val smile: Float,
+//    val eyeOpen: Float,
+//    val headPose: Float
+//) {
+//    init {
+//        require(smile + eyeOpen + headPose == 1f) { "Weights must sum to 1" }
+//    }
+//}
+//
+//data class UpsetThresholds(
+//    val maxHeadAngle: Float,
+//    val maxUpsetScore: Float
+//)
+//sealed class MoodState {
+//    object Normal : MoodState() {
+//        override fun toString() = "calm"
+//    }
+//    object Happy : MoodState() {
+//        override fun toString() = "happy"
+//    }
+//    object Sad : MoodState() {
+//        override fun toString() = "sad"
+//    }
+//    object Upset : MoodState() {
+//        override fun toString() = "upset"
+//    }
+//}
