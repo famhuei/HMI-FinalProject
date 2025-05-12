@@ -13,6 +13,7 @@ import com.example.amobileappfordisabledpeople.ui.views.DangerWarningScreen
 import com.example.amobileappfordisabledpeople.ui.views.DetectionScreen
 import com.example.amobileappfordisabledpeople.ui.views.ExploreScreen
 import com.example.amobileappfordisabledpeople.ui.views.FaceRecognitionScreen
+import com.example.amobileappfordisabledpeople.ui.views.IntroScreen
 import com.example.amobileappfordisabledpeople.ui.views.MoodTrackingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -41,7 +42,7 @@ fun ApplicationNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = DetectionDestination.route,
+        startDestination = Intro.route,
         modifier = modifier
     ) {
         composable(route = DetectionDestination.route) {
@@ -50,9 +51,8 @@ fun ApplicationNavHost(
                 interpreter = interpreter,
                 labels = labels,
                 textToSpeech = textToSpeech,
-                navigateToDangerWarning = {navController.navigate(ExploreDestination.route)},
-                navigateToExplore = {navController.navigate(ExploreDestination.route)},
-                navigateToSocializingMode = {navController.navigate(MoodTrackingDestination.route)}
+                navigateToFaceRecognition = {navController.navigate(FaceRecognition.route)},
+                navigateToIntro = {navController.navigate(Intro.route)}
             )
         }
         composable(route = ExploreDestination.route) {
@@ -73,11 +73,21 @@ fun ApplicationNavHost(
         composable(route = FaceRecognition.route) {
             FaceRecognitionScreen(
                 cameraExecutor = cameraExecutor,
-                navigateToMoodTracking = {navController.navigate(MoodTrackingDestination.route)},
-                navigateToExploreMode = {navController.navigate(DetectionDestination.route)}
+//                navigateToMoodTracking = {navController.navigate(MoodTrackingDestination.route)},
+//                navigateToExploreMode = {navController.navigate(DetectionDestination.route)},
+                navigateToDetection = {navController.navigate(DetectionDestination.route)},
+                navigateToIntro = {navController.navigate(Intro.route)},
+                textToSpeech = textToSpeech
             )
 
         }
+        composable(route = Intro.route) {
+            IntroScreen(
+                navigateToDetection = {navController.navigate(DetectionDestination.route)},
+                textToSpeech = textToSpeech,
+                navigateToFaceRecognition = {navController.navigate(FaceRecognition.route)}
+            )
 
+        }
     }
 }

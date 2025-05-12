@@ -31,3 +31,7 @@ object FaceRecognition: NavigationDestination {
     override val route = "face_recognition"
     override val titleRes = R.string.face_recognition
 }
+object Intro: NavigationDestination {
+    override val route = "Intro"
+    override val titleRes = R.string.intro
+}
