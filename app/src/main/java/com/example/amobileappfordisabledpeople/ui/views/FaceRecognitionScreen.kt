@@ -53,7 +53,7 @@ fun FaceRecognitionScreen(
     cameraExecutor: ExecutorService,
     viewModel: MainViewModel = hiltViewModel(),
 //    navigateToMoodTracking: () -> Unit = {},
-//    navigateToExploreMode: () -> Unit = {} ,
+    navigateToExploreMode: () -> Unit = {} ,
     navigateToDetection: () -> Unit = {},
     navigateToIntro: () -> Unit = {},
     textToSpeech: TextToSpeech,
@@ -141,7 +141,10 @@ fun FaceRecognitionScreen(
                     if (abs(dragAmount.x) > abs(dragAmount.y)) {
                         if (abs(dragAmount.x) > DragThreshold) {
 //                            navigateToMoodTracking()
-                            navigateToIntro()
+//                            navigateToIntro()
+                            navigateToExploreMode()
+                        } else {
+                            navigateToExploreMode()
                         }
                     } else {
                         if (abs(dragAmount.y) > DragThreshold) {

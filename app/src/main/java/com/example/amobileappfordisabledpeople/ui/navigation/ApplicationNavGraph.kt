@@ -57,9 +57,9 @@ fun ApplicationNavHost(
         }
         composable(route = ExploreDestination.route) {
             ExploreScreen(
-                navigateToDangerWarning = {navController.navigate(DetectionDestination.route)},
+                navigateToDangerWarning = {navController.navigate(DangerWarningDestination.route)},
                 navigateToDetection = {navController.navigate(DetectionDestination.route)},
-                navigateToSocializingMode = {navController.navigate(MoodTrackingDestination.route)}
+                navigateToSocializingMode = {navController.navigate(FaceRecognition.route)}
             )
 
         }
@@ -74,7 +74,7 @@ fun ApplicationNavHost(
             FaceRecognitionScreen(
                 cameraExecutor = cameraExecutor,
 //                navigateToMoodTracking = {navController.navigate(MoodTrackingDestination.route)},
-//                navigateToExploreMode = {navController.navigate(DetectionDestination.route)},
+                navigateToExploreMode = {navController.navigate(ExploreDestination.route)},
                 navigateToDetection = {navController.navigate(DetectionDestination.route)},
                 navigateToIntro = {navController.navigate(Intro.route)},
                 textToSpeech = textToSpeech
