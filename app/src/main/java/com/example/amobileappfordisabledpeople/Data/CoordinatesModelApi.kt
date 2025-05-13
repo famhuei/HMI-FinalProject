@@ -33,7 +33,7 @@ interface CoordinatesModelApi {
                 .build()
         val instance: CoordinatesModelApi by lazy {
             Retrofit.Builder()
-                .baseUrl("https://paligemma.onrender.com")
+                .baseUrl("http://192.168.1.4:10000")  // Android emulator localhost
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()

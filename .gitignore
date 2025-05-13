@@ -9,7 +9,7 @@
 /captures
 .externalNativeBuild
 .cxx
-
+.env
 # Gradle
 .gradle/
 gradle-app.setting

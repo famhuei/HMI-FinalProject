@@ -26,7 +26,10 @@ class CustomCameraRepoImpl @Inject constructor(
     private val imageCapture: ImageCapture
 ):CustomCameraRepo {
 
-
+    init {
+        // Disable flash mode
+        imageCapture.flashMode = ImageCapture.FLASH_MODE_OFF
+    }
     override suspend fun captureAndSaveImage(context: Context, onImageCaptured: (Uri) -> Unit) {
 
         //for file name
